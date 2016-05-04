@@ -20,9 +20,10 @@
 
 int main(int argc, const char *argv[])
 {
-    vector<double> a = {1.0, 2.0, 3.0};
-    vector<string> colname = { "time" };
-    save_numpy2<double>( a, colname, "a.npy" );
+    vector<double> a = {1.0, 2.0, 3.0, 1.3};
+    vector<string> colname = { "time", "value" };
+    //save_numpy2<double>( "a.npy", a, colname, "w" );
+    save_numpy2<double>( "a.npy", a, colname, "a" );
     return 0;
 }
 
