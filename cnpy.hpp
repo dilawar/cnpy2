@@ -166,7 +166,7 @@ void change_shape_in_header( const string& filename
 
     string newShape = "";
     for (size_t i = 0; i < tokens.size(); i++) 
-        newShape += to_string( stoi( tokens[i] ) + data_len ) + ",";
+        newShape += to_string( stoi( tokens[i] ) + data_len/numcols ) + ",";
 
     string newHeader = prefixHeader + newShape + postfixHeader;
     if( newHeader.size() < header.size() )
@@ -176,8 +176,6 @@ void change_shape_in_header( const string& filename
 
     // Move to at the begining of file and write the new header.
     fseek(fp, 0, SEEK_SET);
-    size_t pos = ftell( fp );
-    cout << "I am at " << pos << endl;
     fwrite( newHeader.c_str(), sizeof(char), newHeader.size(), fp );
     fclose( fp );
 }
@@ -219,7 +217,7 @@ void save_numpy2(
         // Unfortunetely we need to rewrite the header of the file.
         change_shape_in_header( outfile, vec.size(), colnames.size() );
 
-        //  now open the data in append mode and write the data.
+        //  now open the data in append mode 
         fp = fopen( outfile.c_str(), "ab" );
     }
 
