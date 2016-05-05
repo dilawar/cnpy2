@@ -41,14 +41,14 @@ namespace cnpy2 {
 
 // Check the endian-ness of machine at run-time. This is from library 
 // https://github.com/rogersce/cnpy
-char BigEndianTest() {
+inline char BigEndianTest() {
     unsigned char x[] = {1,0};
     short y = *(short*) x;
     return y == 1 ? '<' : '>';
 }
 
 // And another function to convert given std datatype to numpy representation.
-char map_type(const std::type_info& t)
+inline char map_type(const std::type_info& t)
 {
     if(t == typeid(float) ) return 'f';
     if(t == typeid(double) ) return 'f';
