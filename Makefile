@@ -1,5 +1,5 @@
-all : cnpy run
-	echo "Now run make test"
+all : cnpy 
+	echo "Now run make run"
 
 
 cnpy : cnpy.cpp cnpy.hpp
@@ -7,6 +7,7 @@ cnpy : cnpy.cpp cnpy.hpp
 
 run : cnpy
 	./cnpy
+	echo "Now run make test"
 
 test:
 	python ./test.py
