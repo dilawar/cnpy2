@@ -26,6 +26,8 @@
 #include <vector>
 #include <array>
 #include <cstdint>
+#include <complex>
+#include <typeinfo>
 
 #if USE_BOOST
 #include <boost/algorithm/string/split.hpp>
@@ -34,6 +36,44 @@
 #endif
 
 using namespace std;
+
+namespace cnpy2 {
+
+// Check the endian-ness of machine at run-time. This is from library 
+// https://github.com/rogersce/cnpy
+char BigEndianTest() {
+    unsigned char x[] = {1,0};
+    short y = *(short*) x;
+    return y == 1 ? '<' : '>';
+}
+
+// And another function to convert given std datatype to numpy representation.
+char map_type(const std::type_info& t)
+{
+    if(t == typeid(float) ) return 'f';
+    if(t == typeid(double) ) return 'f';
+    if(t == typeid(long double) ) return 'f';
+
+    if(t == typeid(int) ) return 'i';
+    if(t == typeid(char) ) return 'i';
+    if(t == typeid(short) ) return 'i';
+    if(t == typeid(long) ) return 'i';
+    if(t == typeid(long long) ) return 'i';
+
+    if(t == typeid(unsigned char) ) return 'u';
+    if(t == typeid(unsigned short) ) return 'u';
+    if(t == typeid(unsigned long) ) return 'u';
+    if(t == typeid(unsigned long long) ) return 'u';
+    if(t == typeid(unsigned int) ) return 'u';
+
+    if(t == typeid(bool) ) return 'b';
+
+    if(t == typeid(std::complex<float>) ) return 'c';
+    if(t == typeid(std::complex<double>) ) return 'c';
+    if(t == typeid(std::complex<long double>) ) return 'c';
+
+    else return '?';
+}
 
 void split(vector<string>& strs, string& input, const string& pat) 
 {
@@ -59,15 +99,21 @@ array<char, 8> __pre__ = {
     , (char)0x02, (char) 0x00               /* format */
 };
 
-void write_header( FILE* fp, vector<string> colnames, vector<unsigned int>shape )
+template< typename T>
+void write_header( FILE* fp
+        , const vector<string>& colnames
+        , vector<unsigned int>shape 
+        )
 {
     // Heder are always at the begining of file.
     fseek( fp, 0, SEEK_SET );
+    char endianChar = cnpy2::BigEndianTest();
+    char formatChar = cnpy2::map_type( typeid(T) );
 
     string dict = ""; // This is the header to numpy file
     dict += "{'descr': [";
     for( auto v : colnames )
-        dict += "('" + v + "' , 'f8'),";
+        dict += "('" + v + "' , '" + endianChar + formatChar + "'),";
 
     dict += "], 'fortran_order': False, 'shape': (";
     dict += to_string(shape[0]);
@@ -201,7 +247,7 @@ void save_numpy2(
     if( openmode == "w" )
     {
         fp = fopen( outfile.c_str(), "wb" );
-        write_header( fp, colnames, shape );
+        write_header<T>( fp, colnames, shape );
     }
     else                                        /* Append mode. */
     {
@@ -226,4 +272,5 @@ void save_numpy2(
     fclose( fp );
 }
 
+}                                               /* Namespace cnpy2 ends. */
 #endif   /* ----- #ifndef cnpy_INC  ----- */

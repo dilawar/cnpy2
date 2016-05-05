@@ -1,5 +1,5 @@
 all : cnpy run
-	python test.py
+	echo "Now run make test"
 
 
 cnpy : cnpy.cpp cnpy.hpp
@@ -7,6 +7,9 @@ cnpy : cnpy.cpp cnpy.hpp
 
 run : cnpy
 	./cnpy
+
+test:
+	python ./test.py
 	
 clean :
 	git clean -fxd
